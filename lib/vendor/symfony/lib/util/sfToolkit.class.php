@@ -360,9 +360,17 @@ class sfToolkit
    * @param array $replacePairs  array of search => replace pairs
    */
   public static function pregtr($search, $replacePairs)
-  {
-    return preg_replace(array_keys($replacePairs), array_values($replacePairs), $search);
-  }
+    {
+      return preg_replace_callback(
+        '/(' . implode('|', array_map(function($pattern) {
+          return str_replace('/', '\/', $pattern);
+        }, array_keys($replacePairs))) . ')/',
+        function($matches) use ($replacePairs) {
+            return $replacePairs[$matches[0]];
+        },
+        $search
+      );
+    }
 
   /**
    * Checks if array values are empty
